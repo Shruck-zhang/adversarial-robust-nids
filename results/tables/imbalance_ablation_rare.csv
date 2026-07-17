@@ -1,0 +1,5 @@
+strategy,BruteForce_recall,BruteForce_prec,WebAttack_recall,WebAttack_prec,Bot_recall,Bot_prec
+none,0.999,0.999,0.968,0.985,1.0,1.0
+weight-balanced,1.0,0.999,0.978,0.98,1.0,0.997
+weight-sqrt,0.999,1.0,0.964,0.983,1.0,0.997
+SMOTE(train-only),0.999,1.0,0.973,0.971,1.0,1.0

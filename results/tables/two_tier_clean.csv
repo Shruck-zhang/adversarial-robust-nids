@@ -1,0 +1,4 @@
+model,macro_f1,balanced_acc,macro_fpr
+XGBoost,0.9778,0.9746,0.0047
+hardened-DNN,0.9615,0.9699,0.0047
+two-tier,0.961,0.9748,0.0047

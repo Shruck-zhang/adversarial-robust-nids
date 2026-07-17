@@ -1,0 +1,10 @@
+numpy
+pandas
+scikit-learn
+xgboost
+torch
+matplotlib
+joblib
+scapy
+pytest
+pytorch-tabnet

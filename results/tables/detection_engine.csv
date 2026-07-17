@@ -1,0 +1,3 @@
+system,macro_f1,balanced_acc,macro_fpr
+AI-only (two-tier),0.961,0.9748,0.0047
+full engine (rules+AI),0.9592,0.9746,0.0049

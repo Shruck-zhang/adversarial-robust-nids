@@ -1,0 +1,9 @@
+,count,pct,attempted,attempted_pct_of_class
+Benign,1425834,77.619,0,0.0
+DoS,177506,9.663,5872,3.3
+DDoS,95144,5.179,0,0.0
+PortScan,90620,4.933,0,0.0
+BruteForce,6972,0.38,39,0.6
+WebAttack,2056,0.112,1952,94.9
+Bot,1934,0.105,1198,61.9
+Infiltration,36892,2.008,45,0.1

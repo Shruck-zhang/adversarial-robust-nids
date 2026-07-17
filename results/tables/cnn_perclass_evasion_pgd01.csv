@@ -1,0 +1,9 @@
+class,pgd_fnr@0.1
+Benign,0.026
+DoS,0.917
+DDoS,0.929
+PortScan,0.234
+BruteForce,0.23314203730272598
+WebAttack,1.0
+Bot,1.0
+Infiltration,0.9985

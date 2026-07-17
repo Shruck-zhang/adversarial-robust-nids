@@ -1,0 +1,13 @@
+model,class,n_effective,n_attempted,detect_effective,detect_attempted,recall_effective,recall_attempted
+XGBoost,DoS,32450,3052,1.0,0.086,1.0,0.085
+XGBoost,WebAttack,24,387,1.0,0.979,1.0,0.977
+XGBoost,Bot,140,247,1.0,1.0,1.0,1.0
+RandomForest,DoS,32450,3052,1.0,0.085,1.0,0.085
+RandomForest,WebAttack,24,387,0.875,0.956,0.875,0.956
+RandomForest,Bot,140,247,0.993,0.992,0.993,0.992
+MLP,DoS,32450,3052,1.0,0.085,1.0,0.085
+MLP,WebAttack,24,387,0.875,0.935,0.833,0.93
+MLP,Bot,140,247,1.0,1.0,1.0,1.0
+1D-CNN,DoS,32450,3052,0.973,0.002,0.973,0.001
+1D-CNN,WebAttack,24,387,0.167,0.734,0.125,0.734
+1D-CNN,Bot,140,247,0.979,0.996,0.979,0.846

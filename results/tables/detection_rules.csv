@@ -1,0 +1,4 @@
+rule,class,fired,precision_attack,precision_class,recall_of_class
+portscan,PortScan,25685,0.9841,0.7004,0.9926
+bruteforce,BruteForce,1374,0.9934,0.9934,0.9792
+ddos,DDoS,18799,1.0,0.9996,0.9875
