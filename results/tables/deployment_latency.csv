@@ -1,0 +1,4 @@
+stage,p50_ms,p90_ms,p99_ms,max_ms,batch4096_flows_per_s
+two-tier inference (scaled),11.185,24.036,34.188,115.537,53168.0
+"full engine (rules+AI, raw)",12.453,29.174,47.501,85.147,74937.0
+engine + CICFlowMeter adapter,30.111,56.77,65.551,87.385,33304.0

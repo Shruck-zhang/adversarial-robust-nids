@@ -1,6 +1,6 @@
 model,variant,clean_macro_f1,fgsm_evasion@0.1,pgd_evasion@0.1
-MLP,plain,0.8806,0.117,0.124
-MLP,hardened,0.8838,0.053,0.055
+MLP (torch),plain,0.8806,0.117,0.124
+MLP (torch),hardened,0.8838,0.053,0.055
 DNN,plain,0.929,0.088,0.102
 DNN,hardened,0.8928,0.043,0.043
 1D-CNN,plain,0.9572,0.355,0.442

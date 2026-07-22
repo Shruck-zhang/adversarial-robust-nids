@@ -47,7 +47,7 @@ print(f"train {Xtr.shape}  val {Xvs.shape}  attack-eval {Xs.shape}", flush=True)
 Xs = Xs.astype("float32")
 EPS = [0.0, 0.01, 0.02, 0.05, 0.1, 0.15, 0.2, 0.3]
 
-NETS = {"MLP":    lambda: MX.build_mlp_net(nf, nc),
+NETS = {"MLP (torch)": lambda: MX.build_mlp_net(nf, nc),
         "DNN":    lambda: MX.build_dnn_net(nf, nc),
         "1D-CNN": lambda: M._build_cnn1d_net(nf, nc)}
 

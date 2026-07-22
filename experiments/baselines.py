@@ -3,7 +3,7 @@
 
 Trains Random Forest, XGBoost and an MLP/DNN on the cached leakage-free splits
 and reports per-class + imbalance-aware metrics (O1). Results are written to
-results/tables/ for the supervisor demo.
+results/tables/.
 """
 import os, sys, time
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))

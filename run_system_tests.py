@@ -33,6 +33,17 @@ REPORTS = os.path.join(ROOT, "results", "test_reports")
 os.makedirs(REPORTS, exist_ok=True)
 
 results = []
+
+# Software verification is reported separately from
+# independent model / robustness validation. Each layer maps to one category.
+CATEGORY = {
+    "L1-unit": "A. Software verification", "L2-integration": "A. Software verification",
+    "L3-perf": "B. Model & robustness validation", "L4-robust": "B. Model & robustness validation",
+    "L5-attack": "B. Model & robustness validation",
+}
+def category(layer):
+    return CATEGORY.get(layer, "B. Model & robustness validation")
+
 def add(layer, name, value, threshold, op, unit="", detail=""):
     ok = {">=": lambda: value >= threshold, "<=": lambda: value <= threshold,
           "bool": lambda: bool(value)}[op]()
@@ -161,15 +172,22 @@ def _write_html(path, meta):
     grade = "PASS" if n_pass == n else "FAIL"
     colour = "#2E7D32" if grade == "PASS" else "#C62828"
     rows = []
-    for r in sorted(results, key=lambda x: (x["layer"], x["name"])):
-        pc = "#E8F5E9" if r["passed"] else "#FFEBEE"
-        tc = "#2E7D32" if r["passed"] else "#C62828"
-        val = f"{r['value']:.4f}" if isinstance(r["value"], float) else r["value"]
-        rows.append(f"<tr style='background:{pc}'><td>{r['layer']}</td><td>{r['name']}</td>"
-                    f"<td style='text-align:right'>{val} {r['unit']}</td>"
-                    f"<td style='text-align:right'>{r['op']} {r['threshold']}</td>"
-                    f"<td style='color:{tc};font-weight:600'>{'PASS' if r['passed'] else 'FAIL'}</td>"
-                    f"<td style='color:#666;font-size:12px'>{r['detail']}</td></tr>")
+    for cat in ["A. Software verification", "B. Model & robustness validation"]:
+        crs = [r for r in results if category(r["layer"]) == cat]
+        if not crs:
+            continue
+        cp = sum(r["passed"] for r in crs)
+        rows.append(f"<tr style='background:#37474F;color:#fff'><td colspan='6'>"
+                    f"<b>{cat}</b> &nbsp; ({cp}/{len(crs)} passed)</td></tr>")
+        for r in sorted(crs, key=lambda x: (x["layer"], x["name"])):
+            pc = "#E8F5E9" if r["passed"] else "#FFEBEE"
+            tc = "#2E7D32" if r["passed"] else "#C62828"
+            val = f"{r['value']:.4f}" if isinstance(r["value"], float) else r["value"]
+            rows.append(f"<tr style='background:{pc}'><td>{r['layer']}</td><td>{r['name']}</td>"
+                        f"<td style='text-align:right'>{val} {r['unit']}</td>"
+                        f"<td style='text-align:right'>{r['op']} {r['threshold']}</td>"
+                        f"<td style='color:{tc};font-weight:600'>{'PASS' if r['passed'] else 'FAIL'}</td>"
+                        f"<td style='color:#666;font-size:12px'>{r['detail']}</td></tr>")
     html = f"""<!doctype html><meta charset="utf-8"><title>IDS system test report</title>
 <style>body{{font-family:Segoe UI,Arial,sans-serif;margin:32px;color:#222}}
 h1{{margin:0 0 4px}} .sub{{color:#666;margin-bottom:18px}}
@@ -211,6 +229,10 @@ def main():
     n_pass = sum(r["passed"] for r in results); n = len(results)
     grade = "PASS" if n_pass == n else "FAIL"
     print("\n" + "=" * 74)
+    for cat in ["A. Software verification", "B. Model & robustness validation"]:
+        crs = [r for r in results if category(r["layer"]) == cat]
+        if crs:
+            print(f"  {cat}: {sum(r['passed'] for r in crs)}/{len(crs)} passed")
     print(f"  OVERALL: {grade}   {n_pass}/{n} checks passed   ({meta['duration_s']}s)")
     print(f"  report -> {base}.html / .json / .csv")
     print("=" * 74)

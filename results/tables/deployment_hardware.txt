@@ -1,0 +1,1 @@
+Intel64 Family 6 Model 141 Stepping 1, GenuineIntel | 16 logical cores | 17.0 GB RAM | Windows | CPU-only PyTorch

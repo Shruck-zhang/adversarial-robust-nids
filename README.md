@@ -19,6 +19,7 @@ on the *corrected* CICIDS2017 dataset with imbalance-aware metrics throughout.
 - **Two-tier defence in depth** — a non-differentiable tree + a hardened DNN, so an attacker must fool **both** at once. Surfaces a non-obvious result: gradient perturbations **transfer** from the DNN to XGBoost.
 - **Real-time pipeline** — CICFlowMeter live monitor → `tail -f` streaming consumer → detection, scoring each flow the instant it completes (**~159k flows/s** batch throughput).
 - **Engineering rigour** — a 5-layer automated test harness (unit → integration → performance → robustness → attack-simulation), **43/43 checks**, with a graded HTML report.
+- **Scientific rigour** — repeated-run 95% confidence intervals, a stronger **adaptive** ensemble attack, a successful-vs-attempted rare-class breakdown, a latency-distribution deployment study, and a full [methodology & threat-model spec](METHODOLOGY.md) with honestly-stated limitations.
 
 ## System architecture
 
@@ -69,6 +70,31 @@ cases — a non-differentiable tree is *not* inherently safe. The hardened DNN r
 same attack (~2%), and because the two-tier system requires fooling **both** tiers, it
 keeps DNN-level robustness while retaining macro-F1 ≈ 0.96 and a ~0.5% false-alarm rate.
 
+### 4 — Rigour: repeated runs, adaptive attack, honest limitations
+
+**Repeated-run confidence intervals** (5 seeds) show the tree models are stable and the
+neural nets are not — and the tree-vs-neural intervals do not overlap, so the ranking is
+statistically supported, not noise:
+
+![Repeated-run CIs](results/figures/multiseed_ci.png)
+
+**Adaptive attack.** A stronger white-box attack optimised against the ensemble (50-step
+PGD, 5 restarts, concentrated on the hardened DNN — the binding constraint) leaves
+two-tier evasion essentially unchanged from the transfer attack (0.017 at ε = 0.1), so the
+robustness is not an artefact of a weak attacker. This is honestly qualified: the
+perturbations are unconstrained in feature space (a conservative upper bound, not
+necessarily feasible traffic), and query-based / realizable attacks are named as further
+work.
+
+**Successful vs attempted attacks.** Reporting rare classes split by the *attempted* flag
+exposes a blind spot the headline recall hides — attempted DoS is detected only ~9% of the
+time versus ~100% for successful attacks.
+
+See **[METHODOLOGY.md](METHODOLOGY.md)** for the full protocol: experiment provenance and
+reconciliation, the adversarial threat model, the leakage-aware split definition, the
+tuning procedure, and the deployment measurement (which separates model inference from the
+capture-to-alert pipeline).
+
 ## Repository structure
 
 ```
@@ -87,6 +113,7 @@ tests/                     pytest suite (unit + integration)
 experiments/               reproducible pipeline: preprocess, baselines, comparison, robustness, ...
 results/figures|tables/    generated figures and metric tables
 notebooks/                 technical walkthrough (HTML + ipynb)
+METHODOLOGY.md             protocol, threat model, provenance, CIs, deployment measurement
 ```
 
 ## Reproducing

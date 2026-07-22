@@ -1,0 +1,8 @@
+class,successful_n,successful_detect,attempted_n,attempted_detect
+DoS,32450,1.0,3052,0.0855
+DDoS,19029,1.0,0,
+PortScan,18124,0.9998,0,
+BruteForce,1384,1.0,10,1.0
+WebAttack,24,1.0,387,0.9845
+Bot,140,1.0,247,1.0
+Infiltration,7369,0.9995,9,0.8889
