@@ -17,7 +17,7 @@ on the *corrected* CICIDS2017 dataset with imbalance-aware metrics throughout.
 - **Broad, fair model comparison** — 11 architectures (trees, linear, MLP/DNN, 1D-CNN, LSTM/GRU, CNN-LSTM, TabNet) on the same leakage-free split with **imbalance-aware metrics** (macro-F1, balanced accuracy, MCC, per-class FPR).
 - **Adversarial robustness study** — true-gradient **FGSM/PGD** attacks + **adversarial training**; quantifies the robustness–accuracy trade-off across architectures.
 - **Two-tier defence in depth** — a non-differentiable tree + a hardened DNN, so an attacker must fool **both** at once. Surfaces a non-obvious result: gradient perturbations **transfer** from the DNN to XGBoost.
-- **Real-time pipeline** — CICFlowMeter live monitor → `tail -f` streaming consumer → detection, scoring each flow the instant it completes (**~159k flows/s** batch throughput).
+- **Real-time pipeline** — CICFlowMeter live monitor → `tail -f` streaming consumer → detection, scoring each flow the instant it completes (**tens of thousands of flows/s** batched; end-to-end latency is bound by flow completion, not inference).
 - **Engineering rigour** — a 5-layer automated test harness (unit → integration → performance → robustness → attack-simulation), **43/43 checks**, with a graded HTML report.
 - **Scientific rigour** — repeated-run 95% confidence intervals, a stronger **adaptive** ensemble attack, a successful-vs-attempted rare-class breakdown, a latency-distribution deployment study, and a full [methodology & threat-model spec](METHODOLOGY.md) with honestly-stated limitations.
 
@@ -38,7 +38,7 @@ generalises to novel, obfuscated and adversarial traffic.
 | **XGBoost** | **0.967** | 0.986 | **0.0005** |
 | Random Forest | 0.965 | 0.975 | 0.0047 |
 | Decision Tree | 0.957 | 0.974 | 0.0049 |
-| **DNN** (best differentiable) | 0.924 | 0.969 | 0.0050 |
+| **DNN** (strongest differentiable, ≈ MLP) | 0.924 | 0.969 | 0.0050 |
 | MLP | 0.922 | 0.973 | 0.0050 |
 | CNN-LSTM | 0.902 | 0.968 | 0.0054 |
 | 1D-CNN | 0.893 | 0.981 | 0.0013 |
@@ -49,9 +49,12 @@ generalises to novel, obfuscated and adversarial traffic.
 
 ![Model comparison](results/figures/model_comparison.png)
 
-**Gradient-boosted trees win on tabular flow data**; the DNN is the best differentiable
-model; **recurrent models are worst** — flow-level features carry no temporal ordering,
-so sequence models have nothing to exploit (a clean negative control).
+**Gradient-boosted trees win on tabular flow data**; the DNN and MLP are the strongest
+differentiable models (statistically comparable under the repeated-run CIs below);
+**recurrent models are worst** — flow-level features carry no temporal ordering, so
+sequence models have nothing to exploit (a clean negative control). The DNN is later
+chosen as the hardened backstop for its *strongest post-hardening robustness*, not for a
+clean-accuracy lead.
 
 ### 2 — Adversarial robustness
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Adaptive white-box attack against the complete two-tier ensemble.
+"""Adaptive attack against the complete two-tier ensemble (supervisor point 3).
 
 The transfer experiment crafts a weak PGD on the DNN and reads off the effect on
 XGBoost. Here we test an *adaptive* white-box attacker that optimises harder against
@@ -45,16 +45,27 @@ def pgd_from(start, X0n, yn, eps, steps, alpha):
         x = torch.max(torch.min(x, Xb + eps), Xb - eps).clamp(-10, 10)
     return x.detach().numpy().astype("float32")
 
+def true_conf(adv, yn):
+    """DNN softmax probability of the true class (lower = more evasive)."""
+    with torch.no_grad():
+        p = torch.softmax(net(torch.tensor(adv, dtype=torch.float32)), 1).numpy()
+    return p[np.arange(len(yn)), yn]
+
 def adaptive(X0n, yn, eps, steps=50, restarts=5):
-    """Multi-restart strong PGD; keep, per sample, the first adv that evades the DNN."""
+    """Multi-restart strong PGD; keep, per sample, the MOST evasive adversarial example
+    (lowest true-class confidence). Always returns a real adv (never the clean sample),
+    so every downstream tier statistic is measured on genuine perturbations."""
     alpha = eps / 10.0
-    best = X0n.copy(); evaded = np.zeros(len(X0n), bool)
+    best, bestc = None, None
     for r in range(restarts):
         start = X0n if r == 0 else np.clip(X0n + rng.uniform(-eps, eps, X0n.shape), -10, 10).astype("float32")
         adv = pgd_from(start, X0n, yn, eps, steps, alpha)
-        e = dnn.predict(adv) == BEN
-        newly = e & ~evaded
-        best[newly] = adv[newly]; evaded |= e
+        c = true_conf(adv, yn)
+        if best is None:
+            best, bestc = adv.copy(), c
+        else:
+            m = c < bestc
+            best[m] = adv[m]; bestc[m] = c[m]
     return best
 
 rows = []
