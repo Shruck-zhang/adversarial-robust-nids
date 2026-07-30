@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Figures for the rigour analyses: repeated-run CIs, rare-class
+"""Figures for the supervisor-review response: repeated-run CIs, rare-class
 successful-vs-attempted detection, and adaptive-vs-transfer ensemble evasion."""
 import os
 import matplotlib
@@ -34,19 +34,25 @@ p = os.path.join(TAB, "rare_class_attempted.csv")
 if os.path.exists(p):
     d = pd.read_csv(p)
     d = d[d["successful_n"].astype(str) != ""]
-    fig, ax = plt.subplots(figsize=(8, 4.4))
+    fig, ax = plt.subplots(figsize=(10.2, 4.8))
     x = np.arange(len(d)); w = 0.38
     succ = pd.to_numeric(d["successful_detect"], errors="coerce").fillna(0)
     att = pd.to_numeric(d["attempted_detect"], errors="coerce").fillna(0)
     ax.bar(x - w/2, succ, w, label="successful", color="#2E7D32")
     ax.bar(x + w/2, att, w, label="attempted", color="#C62828")
-    ax.set_xticks(x); ax.set_xticklabels(d["class"], rotation=20, ha="right")
-    ax.set_ylabel("detection rate"); ax.set_ylim(0, 1.05)
-    ax.set_title("Per-class detection: successful vs attempted attacks")
+    # x labels carry the sample counts (supervisor: report counts with percentages)
+    labs = [f"{c}\nn={int(sn)} / {int(an)}" for c, sn, an in
+            zip(d["class"], d["successful_n"], d["attempted_n"].fillna(0))]
+    ax.set_xticks(x); ax.set_xticklabels(labs, rotation=0, fontsize=8)
+    ax.set_ylabel("detection rate"); ax.set_ylim(0, 1.08)
+    ax.set_title("Per-class detection: successful vs attempted attacks  (n = successful / attempted flows)")
+    for xi, v, n in zip(x, succ, d["successful_n"]):
+        ax.annotate(f"{v:.2f}", (xi - w/2, v), textcoords="offset points", xytext=(0, 3),
+                    ha="center", fontsize=7.5, color="#2E7D32")
     for xi, a, n in zip(x, att, d["attempted_n"]):
         if n and not np.isnan(a):
             ax.annotate(f"{a:.2f}", (xi + w/2, a), textcoords="offset points", xytext=(0, 3),
-                        ha="center", fontsize=8, color="#C62828")
+                        ha="center", fontsize=7.5, color="#C62828")
     ax.legend(frameon=False); ax.grid(alpha=0.3, axis="y"); fig.tight_layout()
     fig.savefig(os.path.join(FIG, "rare_class_attempted.png"), dpi=150); plt.close(fig)
     print("saved rare_class_attempted.png")

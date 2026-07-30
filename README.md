@@ -19,7 +19,7 @@ on the *corrected* CICIDS2017 dataset with imbalance-aware metrics throughout.
 - **Two-tier defence in depth** — a non-differentiable tree + a hardened DNN, so an attacker must fool **both** at once. Surfaces a non-obvious result: gradient perturbations **transfer** from the DNN to XGBoost.
 - **Real-time pipeline** — CICFlowMeter live monitor → `tail -f` streaming consumer → detection, scoring each flow the instant it completes (**tens of thousands of flows/s** batched; end-to-end latency is bound by flow completion, not inference).
 - **Engineering rigour** — a 5-layer automated test harness (unit → integration → performance → robustness → attack-simulation), **43/43 checks**, with a graded HTML report.
-- **Scientific rigour** — repeated-run 95% confidence intervals, a stronger **adaptive** ensemble attack, a successful-vs-attempted rare-class breakdown, a latency-distribution deployment study, and a full [methodology & threat-model spec](METHODOLOGY.md) with honestly-stated limitations.
+- **Scientific rigour** — repeated-run 95% confidence intervals, a stronger DNN-targeted multi-restart attack (joint-evasion criterion), a successful-vs-attempted rare-class breakdown, a latency-distribution deployment study, and a full [methodology & threat-model spec](METHODOLOGY.md) with honestly-stated limitations.
 
 ## System architecture
 
@@ -73,20 +73,22 @@ cases — a non-differentiable tree is *not* inherently safe. The hardened DNN r
 same attack (~2%), and because the two-tier system requires fooling **both** tiers, it
 keeps DNN-level robustness while retaining macro-F1 ≈ 0.96 and a ~0.5% false-alarm rate.
 
-### 4 — Rigour: repeated runs, adaptive attack, honest limitations
+### 4 — Rigour: repeated runs, a stronger attack, honest limitations
 
 **Repeated-run confidence intervals** (5 seeds) show the tree models are stable and the
-neural nets are not — and the tree-vs-neural intervals do not overlap, so the ranking is
-statistically supported, not noise:
+neural nets are not. Rather than reading significance off the intervals, a **seed-matched
+paired t-test** confirms the trees score higher on **every seed** (p = 0.0004–0.007), while
+MLP and DNN are statistically indistinguishable (p = 0.57):
 
 ![Repeated-run CIs](results/figures/multiseed_ci.png)
 
-**Adaptive attack.** A stronger white-box attack optimised against the ensemble (50-step
-PGD, 5 restarts, concentrated on the hardened DNN — the binding constraint) leaves
+**Stronger attack.** A stronger, DNN-targeted, multi-restart white-box attack (50-step
+PGD, 5 restarts, concentrated on the hardened DNN — the binding constraint) with a
+joint-evasion criterion (not a genuinely ensemble-aware attack, which is future work) leaves
 two-tier evasion essentially unchanged from the transfer attack (0.017 at ε = 0.1), so the
 robustness is not an artefact of a weak attacker. This is honestly qualified: the
-perturbations are unconstrained in feature space (a conservative upper bound, not
-necessarily feasible traffic), and query-based / realizable attacks are named as further
+perturbations are unconstrained in feature space — a feature-space robustness stress test,
+not a formal upper bound (the perturbed vectors may not be valid traffic), and query-based / realizable attacks are named as further
 work.
 
 **Successful vs attempted attacks.** Reporting rare classes split by the *attempted* flag
@@ -149,8 +151,8 @@ Matplotlib.
 
 - Built on the **corrected** CICIDS2017 (Engelen, Rimmer & Joosen, WTMC 2021), which
   fixes flow-construction and labelling defects in the original release.
-- Adversarial perturbations here are unconstrained in feature space — a **conservative
-  upper bound** on a realistic attacker who must keep traffic protocol-valid.
+- Adversarial perturbations here are unconstrained in feature space — a **feature-space
+  robustness stress test**, not a formal upper bound — the perturbed vectors may not be valid traffic.
 - Research / educational project. No dataset or captured traffic is redistributed here.
 
 ## License
